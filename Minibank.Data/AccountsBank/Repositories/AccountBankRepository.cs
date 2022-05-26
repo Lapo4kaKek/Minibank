@@ -5,28 +5,22 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Minibank.Data.Transactions.Repositories;
 namespace Minibank.Data.AccountsBank
 {
     public class AccountBankRepository : IAccountBankRepository
     {
-        private static List<AccountBankDbModel> _accountStorage = new List<AccountBankDbModel>();
-        public void Create(AccountBank accountBank)
+        //private static List<AccountBankDbModel> _accountStorage = new List<AccountBankDbModel>();
+        private readonly MinibankContext _context;
+
+        public AccountBankRepository(MinibankContext context)
         {
-            
-            switch (accountBank.Currency)
-            {
-                case "USD":
-                    accountBank.Currency = "USD";
-                    break;
-                case "EUR":
-                    accountBank.Currency = "EUR";
-                    break;
-                case "RUB":
-                    accountBank.Currency = "RUB";
-                    break;
-                default: throw new UserFriendlyException("Из валют доступны только USD, EUR, RUB");
-            }
+            _context = context;
+        }
+        public async Task CreateAsync(AccountBank accountBank)
+        {
             var entity = new AccountBankDbModel()
             {
                 AccountPriv = accountBank.AccountPriv,
@@ -37,24 +31,24 @@ namespace Minibank.Data.AccountsBank
                 Currency = accountBank.Currency,
                 Id = Guid.NewGuid().ToString()
             };
-            _accountStorage.Add(entity);
+            await _context.Accounts.AddAsync(entity);
+            await _context.SaveChangesAsync();
         }
 
-        public bool IsExistsAccount(string userId)
+        public async Task<bool> IsExistsAccountAsync(string userId)
         {
-            //bool result = false;
-            foreach (var item in _accountStorage)
+            var entity = await _context.Accounts.AsNoTracking()
+                .FirstOrDefaultAsync(it => it.UserId == userId);
+            if (entity.UserId == null)
             {
-                if (item.UserId == userId)
-                {
-                    return true;
-                }
+                return false;
             }
-            return false;
+            return true;
         }
-        public void CloseAccount(string id)
+
+        public async Task CloseAccountAsync(string id)
         {
-            foreach (var item in _accountStorage)
+            await foreach (var item in _context.Accounts)
             {
                 if (item.Id == id)
                 {
@@ -62,12 +56,13 @@ namespace Minibank.Data.AccountsBank
                     break;
                 }
             }
+            _context.SaveChanges();
         }
 
         public double Comission(double sum, string fromAccountBankId, string toAccountBankId)
         {
-            var fromAccount = _accountStorage.SingleOrDefault(i => i.Id == fromAccountBankId);
-            var toAccount = _accountStorage.SingleOrDefault(i => i.Id == toAccountBankId);
+            var fromAccount = _context.Accounts.SingleOrDefault(i => i.Id == fromAccountBankId);
+            var toAccount = _context.Accounts.SingleOrDefault(i => i.Id == toAccountBankId);
             if (fromAccount == null || toAccount == null)
             {
                 throw new UserFriendlyException("не валидные id");
@@ -82,12 +77,13 @@ namespace Minibank.Data.AccountsBank
             {
                 throw new UserFriendlyException("на счете недостаточно средств", fromAccount.Balance.ToString());
             }
+            _context.SaveChanges();
             return double.Parse(String.Format("{0:0.00}", 2 * fromAccount.Balance / 100));
         }
 
-        public AccountBank GetAccount(string id)
+        public async Task<AccountBank> GetAccountAsync(string id)
         {
-            foreach (var item in _accountStorage)
+            await foreach (var item in _context.Accounts)
             {
                 if (item.Id == id)
                 {
@@ -107,27 +103,10 @@ namespace Minibank.Data.AccountsBank
 
             throw new UserFriendlyException(message:"Аккаунта с таким id нет");
         }
-
-
-
-        public bool IsExists(string id)
-        {
-            bool result = false;
-            foreach (var item in _accountStorage)
-            {
-                if (item.Id == id)
-                {
-                    result = true;
-                    break;
-                }
-            }
-
-            return result;
-        }
-        public IEnumerable<AccountBank> Get(string userId)
+        public async Task<IEnumerable<AccountBank>> GetAsync(string userId)
         {
             List<AccountBank> showaccount = new List<AccountBank>();
-            foreach (var item in _accountStorage)
+            await foreach (var item in _context.Accounts)
             {
                 if (item.UserId == userId)
                 {
@@ -148,10 +127,10 @@ namespace Minibank.Data.AccountsBank
             return showaccount;
         }
 
-        public void TransferFee(double sum, string fromAccountBankId, string toAccountBankId, IDatabase database)
+        public async Task TransferFeeAsync(double sum, string fromAccountBankId, string toAccountBankId, IDatabase database)
         {
-            var fromAccount = _accountStorage.SingleOrDefault(i => i.Id == fromAccountBankId);
-            var toAccount = _accountStorage.SingleOrDefault(i => i.Id == toAccountBankId);
+            var fromAccount = await _context.Accounts.SingleOrDefaultAsync(i => i.Id == fromAccountBankId);
+            var toAccount = await _context.Accounts.SingleOrDefaultAsync(i => i.Id == toAccountBankId);
             if (fromAccount == null || toAccount == null)
             {
                 throw new UserFriendlyException(message:"неверные данные");
@@ -165,6 +144,7 @@ namespace Minibank.Data.AccountsBank
             fromAccount.Balance -= totalSum;
             toAccount.Balance += a.ConvertCurrency(sum, fromAccount.Currency, toAccount.Currency, database);
             TransactionRepository.AddTransaction(sum, fromAccountBankId, toAccountBankId);
+            _context.SaveChanges();
         }
 
         

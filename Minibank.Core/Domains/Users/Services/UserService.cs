@@ -22,42 +22,42 @@ namespace Minibank.Core.Domains.Users.Services
             //_accountBankService = accountBankService;
         }
 
-        public User Get(string id)
+        public async Task<User> GetAsync(string id)
         {
-            return _userRepository.Get(id);
+            return await _userRepository.GetAsync(id);
         }
 
-        public IEnumerable<User> GetAll()
+        public async Task<IEnumerable<User>> GetAllAsync()
         {
-            return _userRepository.GetAll();
+            return await _userRepository.GetAllAsync();
         }
 
-        public void Create(User user)
+        public async Task CreateAsync(User user)
         {
             if (user.Login == null || user.Login.Length > 20)
             {
                 // 
                 throw new Exception("Не задан логин или длина более 20 символов");
             }
-            _userRepository.Create(user);
+            await _userRepository.CreateAsync(user);
         }
 
-        public void UpdateUser(string id, User user)
+        public async Task UpdateUserAsync(string id, User user)
         {
-            _userRepository.UpdateUser(id, user);
+            await _userRepository.UpdateUserAsync(id, user);
         }
-        public void Delete(string id)
+        public async Task DeleteAsync(string id)
         {
-            if (_accountBankRepository.IsExistsAccount(id))
+            if (await _accountBankRepository.IsExistsAccountAsync(id))
             {
                 throw new Exception("У вас есть привязанный аккаунт");
             }
 
-            _userRepository.Delete(id);
+            await _userRepository.DeleteAsync(id);
         }
-        public bool Exists(string UserId)
+        public async Task<bool> ExistsAsync(string UserId)
         {
-            return _userRepository.Exists(UserId);
+            return await _userRepository.ExistsAsync(UserId);
         }
     }
 }

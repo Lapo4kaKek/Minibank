@@ -1,17 +1,16 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Minibank.Core.Domains.AccountsBank.Repositories
 {
     public interface IAccountBankRepository
     {
-        void Create(AccountBank accountBank);
-        void CloseAccount(string id);
-        void TransferFee(double sum, string fromAccountBankId, string toAccountBankId, IDatabase database);
-        IEnumerable<AccountBank> Get(string userId);
+        Task CreateAsync(AccountBank accountBank);
+        Task CloseAccountAsync(string id);
+        Task<AccountBank> GetAccountAsync(string id);
+        Task TransferFeeAsync(double sum, string fromAccountBankId, string toAccountBankId, IDatabase database);
+        Task<IEnumerable<AccountBank>> GetAsync(string userId);
         double Comission(double sum, string fromAccountBankId, string toAccountBankId);
-        bool IsExists(string id);
-        bool IsExistsAccount(string userId);
-        AccountBank GetAccount(string id);
-
+        Task<bool> IsExistsAccountAsync(string userId);
     }
 }

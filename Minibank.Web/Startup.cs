@@ -16,6 +16,7 @@ using Microsoft.OpenApi.Models;
 using Minibank.Core;
 using Minibank.Data;
 using Minibank.Data.HttpCLients;
+using Minibank.Web.HostedServices;
 using Minibank.Web.Middlewares;
 
 namespace Minibank.Web
@@ -49,7 +50,7 @@ namespace Minibank.Web
                 //c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
             });
             services.AddOptions<ApplicationSettings>("MyService");
-
+            services.AddHostedService<MigrationHostedService>();
             services
                 .AddData(Configuration)
                 .AddCore();

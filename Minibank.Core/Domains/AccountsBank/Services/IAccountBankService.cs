@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 namespace Minibank.Core.Domains.AccountsBank.Services
 {
     public interface IAccountBankService
     {
-        void Create(AccountBank accountBank);
-        void CloseAccount(string id);
+        Task CreateAsync(AccountBank accountBank);
+        Task CloseAccountAsync(string id);
         // считаем кэш
-        void TransferFee(double sum, string fromAccountBankId, string toAccountBankId, IDatabase database);
+        Task TransferFeeAsync(double sum, string fromAccountBankId, string toAccountBankId, IDatabase database);
         // считаем комиссию
         double Comission(double sum, string fromAccountBankId, string toAccountBankId);
-        IEnumerable<AccountBank> Get(string userId);
-        bool IsExists(string id);
-        AccountBank GetAccount(string id);
-        bool IsExistsAccount(string userId);
+        Task<IEnumerable<AccountBank>> GetAsync(string userId);
+        Task<AccountBank> GetAccountAsync(string id);
+        Task<bool> IsExistsAccountAsync(string userId);
     }
 }

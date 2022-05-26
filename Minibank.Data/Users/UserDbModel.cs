@@ -1,8 +1,9 @@
-﻿
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Minibank.Core.Domains.Users;
+using Minibank.Data.AccountsBank;
 
 namespace Minibank.Data.Users
 {
@@ -18,6 +19,8 @@ namespace Minibank.Data.Users
         public string Password { get; set; }
         [Column("is_active")]
         public bool isActive { get; set; }
+
+        public List<AccountBankDbModel> Accounts { get; set; }
 
         internal class Map : IEntityTypeConfiguration<UserDbModel>
         {

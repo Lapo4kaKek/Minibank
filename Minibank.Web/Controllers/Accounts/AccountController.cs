@@ -5,6 +5,7 @@ using Minibank.Core.Domains.AccountsBank.Services;
 using Minibank.Web.Controllers.Accounts.Dto;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 namespace Minibank.Web.Controllers.Accounts
@@ -28,9 +29,9 @@ namespace Minibank.Web.Controllers.Accounts
         /// <param name="fromAccountBankId">аккаунт отправителя</param>
         /// <param name="toAccountBankId">аккаунт получателя</param>
         [HttpPost("/transfer")]
-        public void TransferFee(double sum, string fromAccountBankId, string toAccountBankId)
+        public async Task TransferFeeAsync(double sum, string fromAccountBankId, string toAccountBankId)
         {
-            _accountBankService.TransferFee(sum, fromAccountBankId, toAccountBankId, _database);
+           await  _accountBankService.TransferFeeAsync(sum, fromAccountBankId, toAccountBankId, _database);
         }
         /// <summary>
         /// Узнать комиссию
@@ -50,9 +51,9 @@ namespace Minibank.Web.Controllers.Accounts
         /// <param name="id">id аккаунта который надо закрыть</param>
         /// <exception cref="ValidationException"></exception>
         [HttpPost("/{id}/close")]
-        public void CloseAccount(string id)
+        public async Task CloseAccountAsync(string id)
         {
-            _accountBankService.CloseAccount(id);
+            await _accountBankService.CloseAccountAsync(id);
             
         }
         /// <summary>
@@ -61,9 +62,9 @@ namespace Minibank.Web.Controllers.Accounts
         /// <param name="id">id аккаунта</param>
         /// <returns>возвращает нужным аккаунт</returns>
         [HttpGet("/{id}")]
-        public AccountBank GetAccount(string id)
+        public async Task<AccountBank> GetAccountAsync(string id)
         {
-            return _accountBankService.GetAccount(id);
+            return await _accountBankService.GetAccountAsync(id);
         }
         
         /// <summary>
@@ -72,9 +73,9 @@ namespace Minibank.Web.Controllers.Accounts
         /// <param name="userId">id пользователя</param>
         /// <returns>список аккаунтов</returns>
         [HttpGet]
-        public IEnumerable<AccountBank> GetAccounts(string UserId)
+        public async Task<IEnumerable<AccountBank>> GetAccountsAsync(string userId)
         {
-            return _accountBankService.Get(UserId);
+            return await _accountBankService.GetAsync(userId);
         }
         /// <summary>
         /// Создать аккаунт
@@ -84,7 +85,7 @@ namespace Minibank.Web.Controllers.Accounts
         /// <param name="balance">изначальный баланс</param>
         /// <exception cref="ValidationException"></exception>
         [HttpPost()]
-        public void CreateAccount(string UserId, string currency, double balance)
+        public async Task CreateAccountAsync(string UserId, string currency, double balance)
         {
             AccountDto model = new AccountDto()
             {
@@ -95,7 +96,7 @@ namespace Minibank.Web.Controllers.Accounts
                 CloseAccount = DateTime.MaxValue,
                 AccountPriv = true
             };
-            _accountBankService.Create(new AccountBank()
+            await _accountBankService.CreateAsync(new AccountBank()
             {
                 UserId = model.UserId,
                 Id = model.Id,

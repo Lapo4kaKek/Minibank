@@ -5,6 +5,7 @@ using Minibank.Core.Domains.Users.Services;
 using Minibank.Web.Controllers.Users.Dto;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 namespace Minibank.Web.Controllers.Users
@@ -17,7 +18,6 @@ namespace Minibank.Web.Controllers.Users
         public UserController(IUserService userService)
         {
             _userService = userService;
-
         }
         /// <summary>
         /// Создать пользователя
@@ -25,23 +25,23 @@ namespace Minibank.Web.Controllers.Users
         /// <param name="login"></param>
         /// <param name="email"></param>
         [HttpPost("/{login, email}")]
-        public void CreateUser(UserUpdateDto user)
+        public async Task CreateUser(UserUpdateDto user)
         {
             UserDto model = new UserDto() { Login = user.Login, Email = user.Email };
-            _userService.Create(new User
+            await _userService.CreateAsync(new User
             {
                 Email = model.Email,
                 Login = model.Login
-            });  
+            });
         }
         /// <summary>
         /// Вернуть список пользователей
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<User> GetUsers()
+        public async Task<IEnumerable<User>> GetUsers()
         {
-            return _userService.GetAll();
+            return await _userService.GetAllAsync();
         }
         /// <summary>
         /// Update email
@@ -49,18 +49,18 @@ namespace Minibank.Web.Controllers.Users
         /// <param name="id"></param>
         /// <param name="model"></param>
         [HttpPut("{id}/{Login, Email}")]
-        public void UpdateUser(string id, UserUpdateDto model)
+        public async Task UpdateUser(string id, UserUpdateDto model)
         {
-            _userService.UpdateUser(id, new User() { Email = model.Email, Login = model.Login});
+            await _userService.UpdateUserAsync(id, new User() { Email = model.Email, Login = model.Login});
         }
         /// <summary>
         /// Удалить пользователя
         /// </summary>
         /// <param name="id"></param>
         [HttpDelete("/{id}")]
-        public void DeleteUser(string id)
+        public async Task DeleteUser(string id)
         {
-            _userService.Delete(id);
+            await _userService.DeleteAsync(id);
         }
     }
 }

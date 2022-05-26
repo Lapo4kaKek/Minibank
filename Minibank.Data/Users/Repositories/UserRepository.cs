@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 
 namespace Minibank.Data.Users.Repositories
@@ -20,35 +21,35 @@ namespace Minibank.Data.Users.Repositories
         {
             _context = context;
         }
-        public User Get(string id)
+        public async Task<User> GetAsync(string id)
         {
-            var entity = _context.Users
+            var entity = await _context.Users
                 .AsNoTracking()
-                .FirstOrDefault(it => it.Id == id);
+                .FirstOrDefaultAsync(it => it.Id == id);
 
             if (entity == null)
             {
                 return null;
             }
-
-            return new User
+            var result = new User
             {
                 Id = entity.Id,
 
             };
+            return result;
         }
 
-        public IEnumerable<User> GetAll()
+        public async Task<IEnumerable<User>> GetAllAsync()
         {
-            return _context.Users.Select(it => new User()
+            return await Task.FromResult<IEnumerable<User>>(_context.Users.Select(it => new User()
             {
                 Id = it.Id,
                 Email = it.Email,
                 Login = it.Login
-            });
+            }));
         }
 
-        public void Create(User user)
+        public async Task CreateAsync(User user)
         {
             var entity = new UserDbModel
             {
@@ -59,13 +60,14 @@ namespace Minibank.Data.Users.Repositories
                 Password = Guid.NewGuid().ToString()
             };
 
-            _context.Users.Add(entity);
-            _context.SaveChanges();
+            await _context.Users.AddAsync(entity);
+            await _context.SaveChangesAsync();
+            //return Task.CompletedTask;
         }
         
-        public void UpdateUser(string id, User user)
+        public async Task UpdateUserAsync(string id, User user)
         {
-            var exsistUser = _context.Users.FirstOrDefault(_ => _.Id == id);
+            var exsistUser = await _context.Users.FirstOrDefaultAsync(_ => _.Id == id);
 
             if (exsistUser == null)
             {
@@ -73,19 +75,19 @@ namespace Minibank.Data.Users.Repositories
             }
             exsistUser.Login = user.Login;
             exsistUser.Email = user.Email;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
        
 
-        public void Delete(string id)
+        public async Task DeleteAsync(string id)
         {
-            var entity = _context.Users.FirstOrDefault(it => it.Id == id);
+            var entity = await _context.Users.FirstOrDefaultAsync(it => it.Id == id);
             
             if (entity != null)
             {
                 _context.Users.Remove(entity);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
             else
             {
@@ -93,10 +95,10 @@ namespace Minibank.Data.Users.Repositories
             }
         }
 
-        public bool Exists(string UserId)
+        public async Task<bool> ExistsAsync(string UserId)
         {
             bool result = false;
-            foreach (var item in _context.Users)
+            await foreach (var item in _context.Users)
             {
                 if (item.Id == UserId)
                 {
@@ -104,6 +106,7 @@ namespace Minibank.Data.Users.Repositories
                     break;
                 }
             }
+
             return result;
         }
     }

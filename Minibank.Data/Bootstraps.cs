@@ -24,8 +24,9 @@ namespace Minibank.Data
             });
             services.AddScoped<IAccountBankRepository, AccountBankRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddDbContext<MinibankContext>(options => options.
-                UseNpgsql("Host=localhost;Port=5432;Database=minibank;Username=postgres;Password=Wasalas2003"));
+            services.AddDbContext<MinibankContext>(options => options
+                //.UseLazyLoadingProxies()
+                .UseNpgsql("Host=localhost;Port=5432;Database=minibank;Username=postgres;Password=Wasalas2003"));
             return services;
         }
     }
