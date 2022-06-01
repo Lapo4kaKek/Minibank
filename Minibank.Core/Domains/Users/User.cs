@@ -8,6 +8,12 @@ namespace Minibank.Core.Domains.Users
 {
     public class User
     {
+        public User()
+        {
+            Id = "";
+            Login = "";
+            Email = "";
+        }
         public string Id { get; set; }
         public string Login { get; set; }
         public string Email { get; set; }

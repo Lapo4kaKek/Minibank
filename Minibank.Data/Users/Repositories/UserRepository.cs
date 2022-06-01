@@ -17,6 +17,7 @@ namespace Minibank.Data.Users.Repositories
         //private static List<UserDbModel> _userStorage = new List<UserDbModel>();
         private readonly MinibankContext _context;
 
+        
         public UserRepository(MinibankContext context)
         {
             _context = context;
@@ -34,7 +35,8 @@ namespace Minibank.Data.Users.Repositories
             var result = new User
             {
                 Id = entity.Id,
-
+                Login = entity.Login,
+                Email = entity.Email
             };
             return result;
         }

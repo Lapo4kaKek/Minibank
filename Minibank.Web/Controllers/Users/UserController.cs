@@ -25,7 +25,7 @@ namespace Minibank.Web.Controllers.Users
         /// <param name="login"></param>
         /// <param name="email"></param>
         [HttpPost("/{login, email}")]
-        public async Task CreateUser(UserUpdateDto user)
+        public async Task CreateUserAsync(UserUpdateDto user)
         {
             UserDto model = new UserDto() { Login = user.Login, Email = user.Email };
             await _userService.CreateAsync(new User
@@ -49,7 +49,7 @@ namespace Minibank.Web.Controllers.Users
         /// <param name="id"></param>
         /// <param name="model"></param>
         [HttpPut("{id}/{Login, Email}")]
-        public async Task UpdateUser(string id, UserUpdateDto model)
+        public async Task UpdateUserAsync(string id, UserUpdateDto model)
         {
             await _userService.UpdateUserAsync(id, new User() { Email = model.Email, Login = model.Login});
         }
@@ -58,7 +58,7 @@ namespace Minibank.Web.Controllers.Users
         /// </summary>
         /// <param name="id"></param>
         [HttpDelete("/{id}")]
-        public async Task DeleteUser(string id)
+        public async Task DeleteUserAsync(string id)
         {
             await _userService.DeleteAsync(id);
         }

@@ -14,7 +14,7 @@ namespace Minibank.Core.Domains.Users.Services
         private readonly IUserRepository _userRepository;
         private readonly IAccountBankRepository _accountBankRepository;
         //private readonly IAccountBankService _accountBankService;
-
+        public UserService() {}
         public UserService(IUserRepository userRepository, IAccountBankRepository accountBankRepository)
         {
             _userRepository = userRepository;
@@ -57,6 +57,10 @@ namespace Minibank.Core.Domains.Users.Services
         }
         public async Task<bool> ExistsAsync(string UserId)
         {
+            if (UserId == "" || UserId ==null)
+            {
+                return false;
+            }
             return await _userRepository.ExistsAsync(UserId);
         }
     }

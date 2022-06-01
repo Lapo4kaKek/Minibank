@@ -12,7 +12,6 @@ namespace Minibank.Data.AccountsBank
 {
     public class AccountBankRepository : IAccountBankRepository
     {
-        //private static List<AccountBankDbModel> _accountStorage = new List<AccountBankDbModel>();
         private readonly MinibankContext _context;
 
         public AccountBankRepository(MinibankContext context)
