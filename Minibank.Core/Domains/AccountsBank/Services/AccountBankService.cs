@@ -10,8 +10,9 @@ namespace Minibank.Core.Domains.AccountsBank.Services
     public class AccountBankService : IAccountBankService
     {
         private readonly IAccountBankRepository _accountBankRepository;
-        //private readonly IUserService _userService;
+        // private readonly IUserService _userService;
         private readonly IUserRepository _userRepository;
+        public AccountBankService() {}
         public AccountBankService(IAccountBankRepository accountBankRepository, IUserRepository userRepository)
         {
             _accountBankRepository =accountBankRepository;
@@ -19,10 +20,6 @@ namespace Minibank.Core.Domains.AccountsBank.Services
         }
         public async Task CreateAsync(AccountBank accountBank)
         {
-            if (!await _userRepository.ExistsAsync(accountBank.UserId))
-            {
-                throw new UserFriendlyException("Пользователя с таким id не существует");
-            }
             switch (accountBank.Currency)
             {
                 case "USD":
@@ -34,7 +31,12 @@ namespace Minibank.Core.Domains.AccountsBank.Services
                 case "RUB":
                     accountBank.Currency = "RUB";
                     break;
-                default: throw new UserFriendlyException("Из валют доступны только USD, EUR, RUB");
+                default: 
+                    throw new UserFriendlyException("Из валют доступны только USD, EUR, RUB");
+            }
+            if (!await _userRepository.ExistsAsync(accountBank.UserId))
+            {
+                throw new UserFriendlyException("Пользователя с таким id не существует");
             }
             await _accountBankRepository.CreateAsync(accountBank);
         }
